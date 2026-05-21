@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trending Aandelen Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+
+    h1 { font-size: 1.75rem; font-weight: 700; }
+    h1 span { color: #60a5fa; }
+
+    #status {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    #status.laden { color: #facc15; }
+    #status.fout  { color: #f87171; }
+    #status.ok    { color: #4ade80; }
+
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .kaart {
+      background: #1e2130;
+      border: 1px solid #2d3249;
+      border-radius: 12px;
+      padding: 20px;
+      transition: border-color 0.2s;
+    }
+
+    .kaart:hover { border-color: #60a5fa; }
+
+    .kaart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .ticker { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.05em; }
+    .bedrijf { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
+
+    .score-cirkel {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .score-hoog  { background: #14532d; color: #4ade80; }
+    .score-midden { background: #713f12; color: #fbbf24; }
+    .score-laag  { background: #450a0a; color: #f87171; }
+
+    .prijs-rij {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .prijs { font-size: 1.1rem; font-weight: 600; }
+
+    .verandering {
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .pos { background: #14532d; color: #4ade80; }
+    .neg { background: #450a0a; color: #f87171; }
+    .neu { background: #1e3a5f; color: #93c5fd; }
+
+    .meta-rij {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-bullish   { background: #14532d; color: #4ade80; }
+    .badge-bearish   { background: #450a0a; color: #f87171; }
+    .badge-neutraal  { background: #1e293b; color: #94a3b8; }
+    .badge-kopen     { background: #1e3a5f; color: #60a5fa; }
+    .badge-watchlist { background: #713f12; color: #fbbf24; }
+    .badge-vermijden { background: #450a0a; color: #f87171; }
+    .badge-risico    { background: #1e293b; color: #94a3b8; }
+
+    .volume-balk { margin-bottom: 10px; }
+
+    .volume-label {
+      font-size: 0.7rem;
+      color: #64748b;
+      margin-bottom: 3px;
+    }
+
+    .balk-bg {
+      background: #2d3249;
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .balk-vulling {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(to right, #3b82f6, #60a5fa);
+      transition: width 0.5s;
+    }
+
+    .samenvatting {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      line-height: 1.5;
+      border-top: 1px solid #2d3249;
+      padding-top: 10px;
+      margin-top: 6px;
+    }
+
+    .skeleton {
+      background: #1e2130;
+      border: 1px solid #2d3249;
+      border-radius: 12px;
+      padding: 20px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .skeleton-lijn {
+      background: #2d3249;
+      border-radius: 4px;
+      height: 14px;
+      margin-bottom: 10px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    #fout-bericht {
+      display: none;
+      background: #450a0a;
+      border: 1px solid #f87171;
+      border-radius: 8px;
+      padding: 16px;
+      color: #f87171;
+      margin-bottom: 16px;
+    }
+
+    footer {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Trending <span>Aandelen</span></h1>
+    <div style="font-size:0.8rem;color:#64748b;margin-top:4px">Top 10 momentum aandelen — AI analyse door Claude</div>
+  </div>
+  <div id="status" class="laden">Laden…</div>
+</header>
+
+<div id="fout-bericht"></div>
+<div id="grid"></div>
+
+<footer>Automatisch vernieuwd elke 5 minuten &nbsp;·&nbsp; Data via Yahoo Finance &nbsp;·&nbsp; Analyse via Claude AI</footer>
+
+<script>
+  const API = "/api/trending";
+  const INTERVAL = 5 * 60 * 1000;
+
+  function scoreKlasse(score) {
+    if (score >= 65) return "score-hoog";
+    if (score >= 40) return "score-midden";
+    return "score-laag";
+  }
+
+  function veranderingKlasse(pct) {
+    if (pct > 0) return "pos";
+    if (pct < 0) return "neg";
+    return "neu";
+  }
+
+  function balkBreedte(ratio) {
+    return Math.min(100, (ratio / 3) * 100);
+  }
+
+  function skeletons(n) {
+    return Array.from({ length: n }, () => `
+      <div class="skeleton">
+        <div class="skeleton-lijn" style="width:40%"></div>
+        <div class="skeleton-lijn" style="width:70%"></div>
+        <div class="skeleton-lijn" style="width:55%"></div>
+        <div class="skeleton-lijn" style="width:90%"></div>
+      </div>
+    `).join("");
+  }
+
+  function renderKaart(a) {
+    const pctTeken = a.verandering_pct > 0 ? "+" : "";
+    const vcls = veranderingKlasse(a.verandering_pct);
+    const scls = scoreKlasse(a.score ?? a.momentum_score ?? 0);
+    const score = a.score ?? Math.round(a.momentum_score ?? 0);
+    const breedte = balkBreedte(a.volume_ratio ?? 1);
+
+    return `
+      <div class="kaart">
+        <div class="kaart-header">
+          <div>
+            <div class="ticker">${a.ticker}</div>
+            <div class="bedrijf">${a.bedrijf ?? ""}</div>
+          </div>
+          <div class="score-cirkel ${scls}">${score}</div>
+        </div>
+
+        <div class="prijs-rij">
+          <span class="prijs">$${(a.prijs ?? 0).toLocaleString("nl-NL", { minimumFractionDigits: 2 })}</span>
+          <span class="verandering ${vcls}">${pctTeken}${(a.verandering_pct ?? 0).toFixed(2)}%</span>
+        </div>
+
+        <div class="meta-rij">
+          ${a.sentiment ? `<span class="badge badge-${a.sentiment}">${a.sentiment}</span>` : ""}
+          ${a.actie    ? `<span class="badge badge-${a.actie}">${a.actie}</span>` : ""}
+          ${a.risico   ? `<span class="badge badge-risico">risico: ${a.risico}</span>` : ""}
+        </div>
+
+        <div class="volume-balk">
+          <div class="volume-label">Volume ratio: ${(a.volume_ratio ?? 1).toFixed(2)}×</div>
+          <div class="balk-bg"><div class="balk-vulling" style="width:${breedte}%"></div></div>
+        </div>
+
+        ${a.samenvatting ? `<div class="samenvatting">${a.samenvatting}</div>` : ""}
+      </div>
+    `;
+  }
+
+  async function laadData() {
+    const grid = document.getElementById("grid");
+    const status = document.getElementById("status");
+    const foutDiv = document.getElementById("fout-bericht");
+
+    status.textContent = "Laden…";
+    status.className = "laden";
+    foutDiv.style.display = "none";
+
+    if (!grid.children.length) {
+      grid.innerHTML = skeletons(10);
+    }
+
+    try {
+      const res = await fetch(API);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      grid.innerHTML = data.aandelen.map(renderKaart).join("");
+
+      const nu = new Date().toLocaleTimeString("nl-NL");
+      status.textContent = `Bijgewerkt om ${nu}`;
+      status.className = "ok";
+    } catch (err) {
+      status.textContent = "Fout bij laden";
+      status.className = "fout";
+      foutDiv.style.display = "block";
+      foutDiv.textContent = `Kan geen data ophalen: ${err.message}. Controleer of de backend draait op localhost:8000.`;
+    }
+  }
+
+  laadData();
+  setInterval(laadData, INTERVAL);
+</script>
+</body>
+</html>
