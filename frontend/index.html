@@ -3,425 +3,462 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aandelenradar — Trending aandelen</title>
+  <title>AandelenRadar</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;600&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --goud: #c9a84c;
+      --goud-licht: #f0d080;
+      --donker: #0c0c0e;
+      --donker2: #141416;
+      --donker3: #1e1e22;
+      --rand: #2a2a30;
+      --tekst: #e8e8e0;
+      --grijs: #666672;
+      --groen: #2ecc71;
+      --rood: #e74c3c;
+      --oranje: #e67e22;
+    }
+
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f0f2f5;
-      color: #1a1a2e;
+      font-family: 'Barlow Condensed', sans-serif;
+      background: var(--donker);
+      color: var(--tekst);
       min-height: 100vh;
     }
 
-    /* ── Topbalk ── */
-    .topbalk {
-      background: #162447;
-      color: #fff;
-      padding: 0 24px;
+    /* ── Header ── */
+    header {
+      border-bottom: 1px solid var(--rand);
+      padding: 0 40px;
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .logo-blok {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      height: 56px;
-      border-bottom: 3px solid #e84545;
+      gap: 16px;
+      border-right: 1px solid var(--rand);
+      padding-right: 28px;
     }
 
     .logo {
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: -0.3px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--goud);
+      letter-spacing: -0.5px;
     }
 
-    .logo span { color: #e84545; }
+    .logo-sub {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--grijs);
+      line-height: 1.3;
+    }
 
-    .topbalk-meta {
-      font-size: 0.78rem;
-      color: #94a3b8;
+    .header-rechts {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .header-stat {
       text-align: right;
     }
 
-    /* ── Subbalk ── */
-    .subbalk {
-      background: #1e3163;
-      padding: 0 24px;
-      display: flex;
-      gap: 24px;
-      border-bottom: 1px solid #273d72;
+    .header-stat .waarde {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--tekst);
     }
 
-    .subbalk a {
-      color: #cbd5e1;
+    .header-stat .label {
+      font-size: 0.6rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--grijs);
+    }
+
+    #klok {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--grijs);
+      border-left: 1px solid var(--rand);
+      padding-left: 24px;
+    }
+
+    /* ── Nav ── */
+    nav {
+      background: var(--donker2);
+      border-bottom: 1px solid var(--rand);
+      padding: 0 40px;
+      display: flex;
+      gap: 0;
+    }
+
+    nav a {
+      color: var(--grijs);
       text-decoration: none;
-      font-size: 0.82rem;
-      font-weight: 500;
-      padding: 10px 0;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 12px 20px;
       border-bottom: 2px solid transparent;
       display: inline-block;
+      transition: color .15s;
     }
 
-    .subbalk a.actief {
-      color: #fff;
-      border-bottom-color: #e84545;
-    }
+    nav a:hover { color: var(--tekst); }
+    nav a.actief { color: var(--goud); border-bottom-color: var(--goud); }
 
     /* ── Wrapper ── */
-    .wrapper {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 28px 20px;
-    }
+    .wrapper { max-width: 1200px; margin: 0 auto; padding: 36px 40px; }
 
     /* ── Sectietitel ── */
     .sectietitel {
       display: flex;
-      align-items: baseline;
       justify-content: space-between;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid #162447;
+      align-items: flex-end;
+      margin-bottom: 24px;
     }
 
     .sectietitel h2 {
-      font-size: 1.2rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
       font-weight: 700;
-      color: #162447;
-    }
-
-    .sectietitel .subtitel {
-      font-size: 0.78rem;
-      color: #64748b;
-    }
-
-    #status {
-      font-size: 0.75rem;
-      font-weight: 500;
-      padding: 4px 10px;
-      border-radius: 3px;
-      background: #e2e8f0;
-      color: #475569;
-    }
-
-    #status.laden  { background: #fef3c7; color: #92400e; }
-    #status.fout   { background: #fee2e2; color: #991b1b; }
-    #status.ok     { background: #dcfce7; color: #166534; }
-
-    /* ── Grid ── */
-    #grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 14px;
-    }
-
-    /* ── Kaart ── */
-    .kaart {
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,.06);
-      transition: box-shadow .15s, transform .15s;
-    }
-
-    .kaart:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,.1);
-      transform: translateY(-1px);
-    }
-
-    .kaart-kleur {
-      height: 4px;
-    }
-
-    .kleur-kopen     { background: #16a34a; }
-    .kleur-watchlist { background: #d97706; }
-    .kleur-vermijden { background: #dc2626; }
-
-    .kaart-body { padding: 16px 18px; }
-
-    /* ── Bovenste rij ── */
-    .kaart-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-    }
-
-    .ticker-naam .ticker {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #162447;
+      color: #fff;
       line-height: 1;
     }
 
-    .ticker-naam .bedrijf {
-      font-size: 0.72rem;
-      color: #94a3b8;
-      margin-top: 3px;
-    }
+    .sectietitel h2 span { color: var(--goud); }
 
-    .score-blok {
+    .sectietitel .meta {
+      font-size: 0.72rem;
+      color: var(--grijs);
+      letter-spacing: .05em;
       text-align: right;
     }
 
-    .score-blok .getal {
-      font-size: 1.5rem;
+    #status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 5px 12px;
+      border-radius: 2px;
+      letter-spacing: .05em;
+    }
+
+    #status.laden  { background: #2a2200; color: #c9a84c; border: 1px solid #4a3800; }
+    #status.fout   { background: #2a0000; color: #e74c3c; border: 1px solid #4a0000; }
+    #status.ok     { background: #002a10; color: #2ecc71; border: 1px solid #004a20; }
+
+    /* ── Tabel header ── */
+    .tabel-header {
+      display: grid;
+      grid-template-columns: 48px 1fr 140px 100px 120px 100px 120px;
+      gap: 0;
+      padding: 8px 16px;
+      font-size: 0.62rem;
       font-weight: 700;
-      line-height: 1;
-      color: #162447;
-    }
-
-    .score-blok .label {
-      font-size: 0.65rem;
-      color: #94a3b8;
+      letter-spacing: .12em;
       text-transform: uppercase;
-      letter-spacing: .04em;
+      color: var(--grijs);
+      border-bottom: 1px solid var(--rand);
     }
 
-    /* ── Prijs rij ── */
-    .prijs-rij {
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
-      margin-bottom: 12px;
+    /* ── Rij ── */
+    .rij {
+      display: grid;
+      grid-template-columns: 48px 1fr 140px 100px 120px 100px 120px;
+      gap: 0;
+      padding: 16px 16px;
+      border-bottom: 1px solid var(--donker3);
+      align-items: center;
+      transition: background .12s;
+      cursor: default;
     }
 
-    .prijs {
-      font-size: 1.35rem;
+    .rij:hover { background: var(--donker2); }
+
+    .rij-rank {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--rand);
+      line-height: 1;
+    }
+
+    .rij-aandeel .ticker {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .02em;
+    }
+
+    .rij-aandeel .bedrijf {
+      font-size: 0.7rem;
+      color: var(--grijs);
+      margin-top: 2px;
+    }
+
+    .rij-prijs {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
       font-weight: 600;
-      color: #0f172a;
+      color: var(--tekst);
     }
 
     .verandering {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 0.85rem;
       font-weight: 600;
-      padding: 2px 7px;
-      border-radius: 3px;
-    }
-
-    .pos { background: #dcfce7; color: #15803d; }
-    .neg { background: #fee2e2; color: #b91c1c; }
-    .neu { background: #f1f5f9; color: #475569; }
-
-    /* ── Labels rij ── */
-    .labels-rij {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-
-    .label-pill {
-      font-size: 0.68rem;
-      font-weight: 600;
-      padding: 3px 8px;
+      padding: 4px 10px;
       border-radius: 2px;
-      text-transform: uppercase;
-      letter-spacing: .04em;
+      display: inline-block;
     }
 
-    .pill-bullish   { background: #dcfce7; color: #15803d; }
-    .pill-bearish   { background: #fee2e2; color: #b91c1c; }
-    .pill-neutraal  { background: #f1f5f9; color: #475569; }
-    .pill-kopen     { background: #162447; color: #fff; }
-    .pill-watchlist { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-    .pill-vermijden { background: #fee2e2; color: #991b1b; }
-    .pill-risico    { background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
+    .pos { color: var(--groen); background: rgba(46,204,113,.08); }
+    .neg { color: var(--rood);  background: rgba(231,76,60,.08); }
+    .neu { color: var(--grijs); }
 
-    /* ── Volume balk ── */
-    .volume-rij {
-      margin-bottom: 12px;
-    }
-
-    .volume-header {
+    .score-cel {
       display: flex;
-      justify-content: space-between;
-      font-size: 0.7rem;
-      color: #94a3b8;
-      margin-bottom: 4px;
+      align-items: center;
+      gap: 10px;
     }
 
-    .balk-bg {
-      background: #f1f5f9;
-      border-radius: 2px;
-      height: 5px;
+    .score-getal {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--goud);
+      min-width: 36px;
     }
 
-    .balk-vulling {
+    .score-balk-bg {
+      flex: 1;
+      background: var(--donker3);
+      border-radius: 1px;
+      height: 3px;
+    }
+
+    .score-balk-vul {
       height: 100%;
-      border-radius: 2px;
-      background: #162447;
+      border-radius: 1px;
+      background: var(--goud);
     }
 
-    /* ── Samenvatting ── */
-    .samenvatting {
-      font-size: 0.78rem;
-      color: #475569;
-      line-height: 1.55;
-      padding-top: 12px;
-      border-top: 1px solid #f1f5f9;
+    .actie-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .badge-kopen     { color: var(--groen); border: 1px solid rgba(46,204,113,.3); background: rgba(46,204,113,.05); }
+    .badge-watchlist { color: var(--oranje); border: 1px solid rgba(230,126,34,.3); background: rgba(230,126,34,.05); }
+    .badge-vermijden { color: var(--rood);   border: 1px solid rgba(231,76,60,.3);  background: rgba(231,76,60,.05); }
+
+    .sentiment-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+    }
+
+    .dot-bullish  { background: var(--groen); }
+    .dot-bearish  { background: var(--rood); }
+    .dot-neutraal { background: var(--grijs); }
+
+    .sentiment-tekst {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
     }
 
     /* ── Skeleton ── */
-    .skeleton {
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 18px;
+    .sk-rij {
+      display: grid;
+      grid-template-columns: 48px 1fr 140px 100px 120px 100px 120px;
+      gap: 0;
+      padding: 18px 16px;
+      border-bottom: 1px solid var(--donker3);
       animation: pulse 1.4s ease-in-out infinite;
     }
 
-    .sk-lijn {
-      background: #f1f5f9;
-      border-radius: 3px;
-      height: 13px;
-      margin-bottom: 10px;
+    .sk-blok {
+      height: 14px;
+      background: var(--donker3);
+      border-radius: 2px;
+      align-self: center;
     }
 
     @keyframes pulse {
       0%, 100% { opacity: 1; }
-      50% { opacity: .55; }
+      50% { opacity: .4; }
     }
 
-    /* ── Fout ── */
     .fout-blok {
       display: none;
-      background: #fff5f5;
-      border: 1px solid #fecaca;
-      border-left: 4px solid #dc2626;
-      border-radius: 4px;
-      padding: 14px 16px;
+      border-left: 3px solid var(--rood);
+      background: rgba(231,76,60,.07);
+      padding: 14px 18px;
       font-size: 0.82rem;
-      color: #7f1d1d;
+      color: #f1948a;
+      border-radius: 2px;
       margin-bottom: 20px;
+      font-family: 'JetBrains Mono', monospace;
     }
 
-    /* ── Footer ── */
     footer {
-      background: #162447;
-      color: #64748b;
-      text-align: center;
-      font-size: 0.73rem;
-      padding: 18px;
+      border-top: 1px solid var(--rand);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      color: var(--grijs);
+      letter-spacing: .04em;
       margin-top: 40px;
     }
 
-    footer strong { color: #94a3b8; }
+    @media (max-width: 900px) {
+      header { padding: 0 16px; height: auto; flex-wrap: wrap; gap: 12px; padding: 16px; }
+      nav, .wrapper, footer { padding-left: 16px; padding-right: 16px; }
+      .tabel-header, .rij, .sk-rij {
+        grid-template-columns: 36px 1fr 90px 80px;
+      }
+      .tabel-header > *:nth-child(n+5),
+      .rij > *:nth-child(n+5),
+      .sk-rij > *:nth-child(n+5) { display: none; }
+    }
   </style>
 </head>
 <body>
 
-<div class="topbalk">
-  <div class="logo">Aandelen<span>Radar</span></div>
-  <div class="topbalk-meta" id="tijdstip">—</div>
-</div>
+<header>
+  <div class="logo-blok">
+    <div>
+      <div class="logo">AandelenRadar</div>
+      <div class="logo-sub">Marktanalyse &amp; Trending</div>
+    </div>
+  </div>
+  <div class="header-rechts">
+    <div class="header-stat">
+      <div class="waarde" id="h-tickers">—</div>
+      <div class="label">Aandelen gevolgd</div>
+    </div>
+    <div class="header-stat">
+      <div class="waarde" id="h-kopers">—</div>
+      <div class="label">Koop signalen</div>
+    </div>
+    <div id="klok">—</div>
+  </div>
+</header>
 
-<div class="subbalk">
+<nav>
   <a href="#" class="actief">Trending</a>
-  <a href="#">Top stijgers</a>
-  <a href="#">Top dalers</a>
+  <a href="#">Stijgers</a>
+  <a href="#">Dalers</a>
   <a href="#">Watchlist</a>
-</div>
+</nav>
 
 <div class="wrapper">
   <div class="sectietitel">
     <div>
-      <h2>Trending aandelen vandaag</h2>
-      <div class="subtitel">Top 10 op basis van momentum en volumescore — elke 5 minuten bijgewerkt</div>
+      <h2>Trending <span>vandaag</span></h2>
     </div>
-    <div id="status" class="laden">Laden…</div>
+    <div style="text-align:right">
+      <div id="status" class="laden">LADEN…</div>
+      <div class="meta" style="margin-top:6px">Top 10 op momentum &amp; volume · auto-refresh 5 min</div>
+    </div>
   </div>
 
   <div class="fout-blok" id="fout-blok"></div>
+
+  <div class="tabel-header">
+    <div>#</div>
+    <div>Aandeel</div>
+    <div>Koers</div>
+    <div>Wijziging</div>
+    <div>Score</div>
+    <div>Sentiment</div>
+    <div>Advies</div>
+  </div>
+
   <div id="grid"></div>
 </div>
 
 <footer>
-  <strong>AandelenRadar</strong> &nbsp;·&nbsp; Data via Yahoo Finance &nbsp;·&nbsp; Geen beleggingsadvies
+  <span>AandelenRadar &copy; 2025</span>
+  <span>Data: Yahoo Finance &nbsp;·&nbsp; Geen beleggingsadvies &nbsp;·&nbsp; Vertraging mogelijk</span>
 </footer>
 
 <script>
   const API = "/api/trending";
   const INTERVAL = 5 * 60 * 1000;
 
-  function updateTijd() {
-    const nu = new Date();
-    document.getElementById("tijdstip").textContent =
-      nu.toLocaleDateString("nl-NL", { weekday: "long", day: "numeric", month: "long" }) +
-      " · " + nu.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
+  function updateKlok() {
+    document.getElementById("klok").textContent =
+      new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
   }
-
-  updateTijd();
-  setInterval(updateTijd, 30000);
-
-  function kleurActie(actie) {
-    if (actie === "kopen") return "kleur-kopen";
-    if (actie === "vermijden") return "kleur-vermijden";
-    return "kleur-watchlist";
-  }
+  updateKlok();
+  setInterval(updateKlok, 1000);
 
   function vcls(pct) {
     return pct > 0 ? "pos" : pct < 0 ? "neg" : "neu";
   }
 
-  function balkBreedte(ratio) {
-    return Math.min(100, (ratio / 3) * 100).toFixed(0);
-  }
-
   function skeletons(n) {
-    return Array.from({ length: n }, () => `
-      <div class="skeleton">
-        <div class="sk-lijn" style="width:35%"></div>
-        <div class="sk-lijn" style="width:55%"></div>
-        <div class="sk-lijn" style="width:80%"></div>
-        <div class="sk-lijn" style="width:65%"></div>
+    return Array.from({ length: n }, (_, i) => `
+      <div class="sk-rij">
+        <div class="sk-blok" style="width:24px;height:20px"></div>
+        <div class="sk-blok" style="width:${55 + (i % 3) * 15}%"></div>
+        <div class="sk-blok" style="width:70%"></div>
+        <div class="sk-blok" style="width:60%"></div>
+        <div class="sk-blok" style="width:80%"></div>
+        <div class="sk-blok" style="width:65%"></div>
+        <div class="sk-blok" style="width:55%"></div>
       </div>`).join("");
   }
 
-  function renderKaart(a) {
+  function renderRij(a, index) {
     const pct = a.verandering_pct ?? 0;
     const teken = pct > 0 ? "+" : "";
     const score = a.score ?? Math.round(a.momentum_score ?? 0);
-    const ratio = a.volume_ratio ?? 1;
 
     return `
-      <div class="kaart">
-        <div class="kaart-kleur ${kleurActie(a.actie)}"></div>
-        <div class="kaart-body">
-          <div class="kaart-top">
-            <div class="ticker-naam">
-              <div class="ticker">${a.ticker}</div>
-              <div class="bedrijf">${a.bedrijf ?? ""}</div>
-            </div>
-            <div class="score-blok">
-              <div class="getal">${score}</div>
-              <div class="label">momentum</div>
-            </div>
-          </div>
-
-          <div class="prijs-rij">
-            <span class="prijs">$${(a.prijs ?? 0).toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-            <span class="verandering ${vcls(pct)}">${teken}${pct.toFixed(2)}%</span>
-          </div>
-
-          <div class="labels-rij">
-            ${a.sentiment ? `<span class="label-pill pill-${a.sentiment}">${a.sentiment}</span>` : ""}
-            ${a.actie     ? `<span class="label-pill pill-${a.actie}">${a.actie}</span>` : ""}
-            ${a.risico    ? `<span class="label-pill pill-risico">risico: ${a.risico}</span>` : ""}
-          </div>
-
-          <div class="volume-rij">
-            <div class="volume-header">
-              <span>Volume</span>
-              <span>${ratio.toFixed(2)}× gemiddeld</span>
-            </div>
-            <div class="balk-bg">
-              <div class="balk-vulling" style="width:${balkBreedte(ratio)}%"></div>
-            </div>
-          </div>
-
-          ${a.samenvatting ? `<div class="samenvatting">${a.samenvatting}</div>` : ""}
+      <div class="rij">
+        <div class="rij-rank">${index + 1}</div>
+        <div class="rij-aandeel">
+          <div class="ticker">${a.ticker}</div>
+          <div class="bedrijf">${a.bedrijf ?? ""}</div>
         </div>
+        <div class="rij-prijs">$${(a.prijs ?? 0).toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+        <div><span class="verandering ${vcls(pct)}">${teken}${pct.toFixed(2)}%</span></div>
+        <div class="score-cel">
+          <div class="score-getal">${score}</div>
+          <div class="score-balk-bg"><div class="score-balk-vul" style="width:${score}%"></div></div>
+        </div>
+        <div>
+          <span class="sentiment-dot dot-${a.sentiment ?? 'neutraal'}"></span>
+          <span class="sentiment-tekst">${a.sentiment ?? "—"}</span>
+        </div>
+        <div><span class="actie-badge badge-${a.actie ?? 'watchlist'}">${a.actie ?? "—"}</span></div>
       </div>`;
   }
 
@@ -430,7 +467,7 @@
     const status = document.getElementById("status");
     const foutBlok = document.getElementById("fout-blok");
 
-    status.textContent = "Bijwerken…";
+    status.textContent = "LADEN…";
     status.className = "laden";
     foutBlok.style.display = "none";
 
@@ -441,16 +478,20 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
 
-      grid.innerHTML = data.aandelen.map(renderKaart).join("");
+      grid.innerHTML = data.aandelen.map(renderRij).join("");
+
+      const kopers = data.aandelen.filter(a => a.actie === "kopen").length;
+      document.getElementById("h-tickers").textContent = data.totaal;
+      document.getElementById("h-kopers").textContent = kopers;
 
       const tijd = new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
-      status.textContent = `Bijgewerkt ${tijd}`;
+      status.textContent = `LIVE · ${tijd}`;
       status.className = "ok";
     } catch (err) {
-      status.textContent = "Fout";
+      status.textContent = "FOUT";
       status.className = "fout";
       foutBlok.style.display = "block";
-      foutBlok.textContent = `Gegevens konden niet worden opgehaald (${err.message}). Probeer de pagina te vernieuwen.`;
+      foutBlok.textContent = `ERR: ${err.message}`;
     }
   }
 
